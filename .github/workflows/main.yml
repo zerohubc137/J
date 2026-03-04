@@ -1,0 +1,74 @@
+name: Build DiscordBridge DLL
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:   # กด Run workflow ได้เองบน GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. โหลดโค้ด
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. ติดตั้ง .NET 6
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+
+      # 3. Restore packages
+      - name: Restore
+        run: dotnet restore DiscordBridge.csproj
+
+      # 4. Build
+      - name: Build
+        run: dotnet build DiscordBridge.csproj -c Release --no-restore -o ./output
+
+      # 5. รวมไฟล์ที่ต้องใช้ไว้ใน folder
+      - name: Prepare release folder
+        run: |
+          mkdir -p ./release/DiscordBridge
+          cp ./output/DiscordBridge.dll  ./release/DiscordBridge/
+          cp ./manifest.json             ./release/DiscordBridge/
+          cp ./config.json               ./release/DiscordBridge/
+          echo "Build complete at $(date)" > ./release/DiscordBridge/BUILD_INFO.txt
+
+      # 6. Zip
+      - name: Zip
+        run: |
+          cd ./release
+          zip -r DiscordBridge_v4.zip DiscordBridge/
+
+      # 7. Upload artifact — ดาวน์โหลดได้จาก Actions tab
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DiscordBridge-ready-to-install
+          path: ./release/DiscordBridge_v4.zip
+          retention-days: 90
+
+      # 8. สร้าง Release อัตโนมัติ (ทุก push)
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "build-${{ github.run_number }}"
+          name: "DiscordBridge v4 — Build ${{ github.run_number }}"
+          body: |
+            ## DiscordBridge v4 — พร้อมใช้งาน!
+            
+            ### วิธีติดตั้ง
+            1. ดาวน์โหลด `DiscordBridge_v4.zip` ด้านล่าง
+            2. แตกไฟล์
+            3. ก็อปโฟลเดอร์ `DiscordBridge/` ไปที่:
+               `/storage/emulated/0/Android/data/abc.smapi.gameloader/files/Mods/`
+            4. เปิดเกม — กดปุ่ม **Discord** บน HUD เพื่อตั้งค่า Webhook
+          files: ./release/DiscordBridge_v4.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
