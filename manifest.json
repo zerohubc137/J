@@ -1,0 +1,9 @@
+{
+  "Name": "Discord Voice Bridge",
+  "Author": "StardewVoiceChatDev",
+  "Version": "4.0.0",
+  "Description": "เชื่อม Stardew กับ Discord — ตั้งค่า Webhook/Token ได้ในเกมเลย ไม่ต้องแก้ไฟล์",
+  "UniqueID": "StardewVoiceChatDev.DiscordBridge",
+  "EntryDll": "DiscordBridge.dll",
+  "MinimumApiVersion": "4.0.0"
+}
