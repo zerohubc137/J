@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>DiscordBridge</AssemblyName>
+    <Nullable>enable</Nullable>
+    <LangVersion>10</LangVersion>
+    <Optimize>true</Optimize>
+    <!-- ไม่ใช้ ModBuildConfig เพราะ CI ไม่มีเกมจริง — ใช้ stubs แทน -->
+    <NoWarn>CS8618;CS0649;CS8600;CS8601;CS8602;CS8603;CS8604</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Reference stub DLL ที่ build จาก stubs/ project -->
+    <Reference Include="GameStubs">
+      <HintPath>stubs/bin/Release/net6.0/GameStubs.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="src/**/*.cs" />
+  </ItemGroup>
+</Project>
